@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class EqualityLockService implements Service {
     private final Service service;
-    private Map<Object, ReentrantLock> map = new ConcurrentHashMap<>();
+    private final Map<Object, ReentrantLock> map = new ConcurrentHashMap<>();
 
     public EqualityLockService(Service service) {
         this.service = service;
