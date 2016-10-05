@@ -18,7 +18,7 @@ public class EqualityLockService implements Service {
         try {
             service.run(o);
         } finally {
-            if (lock.hasQueuedThreads()) map.remove(o);
+            if (!lock.hasQueuedThreads()) map.remove(o);
             lock.unlock();
         }
     }
