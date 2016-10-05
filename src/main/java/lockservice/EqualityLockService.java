@@ -14,21 +14,24 @@ public class EqualityLockService implements Service {
 
     @Override
     public void run(Object o) {
-        ReentrantLock lock;
+        ReentrantLock lock = getLock(o);
+        try {
+            service.run(o);
+        } finally {
+            if (lock.hasQueuedThreads()) map.remove(o);
+            lock.unlock();
+        }
+    }
+
+    private ReentrantLock getLock(Object o) {
         while (true) {
-            lock = map.computeIfAbsent(o, obj -> new ReentrantLock());
+            ReentrantLock lock = map.computeIfAbsent(o, obj -> new ReentrantLock());
             try {
                 lock.lock();
             } finally {
                 if (!map.containsValue(lock)) lock.unlock();
-                else break;
+                else return lock;
             }
-        }
-        try {
-            service.run(o);
-        } finally {
-            if (lock.getQueueLength() == 0) map.remove(o);
-            lock.unlock();
         }
     }
 }
